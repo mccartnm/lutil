@@ -1,6 +1,8 @@
 #pragma once
 #include "lutil.h"
 
+#define DEFAULT_SIZE 5
+
 namespace lutil {
 
 namespace LUTIL_VERSION {

@@ -3,17 +3,17 @@
 
 namespace util = lutil::LUTIL_VERSION;
 
-Map<int, String> map;
+util::Map<int, const char *> mapping;
 
 void setup() {
     Serial.begin(115200);
-    map.insert(1, "Test");
-    map.insert(65, "Another");
+    mapping.insert(1, "Test");
+    mapping.insert(65, "Another");
 }
 
 
 void loop() {
-    Serial.println(map[1]);
-    Serial.println(map[65]);
+    Serial.println(mapping[1]);
+    Serial.println(mapping[65]);
     delay(500);
 }
