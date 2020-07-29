@@ -74,6 +74,17 @@ public:
         return row(column);
     }
 
+    bool operator== (const Matrix<COLUMNS, ROWS> &other) const {
+        for (int x = 0; x < COLUMNS; x++) {
+            for (int y = 0; y < ROWS; y++) {
+                // Probably need a fuzzy match
+                if (_data[COLUMNS][ROWS] != other._data[COLUMNS][ROWS])
+                    return false;
+            }
+        }
+        return true;
+    }
+
 private:
     static constexpr size_t _rows = ROWS;
     static constexpr size_t _columns = COLUMNS;

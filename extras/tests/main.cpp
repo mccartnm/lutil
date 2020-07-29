@@ -17,6 +17,10 @@ int main(int argc, char const *argv[])
     mat[0][1] = 12.0f;
     std::cout << mat[0][1] << std::endl;
 
+    Matrix<4, 4> mat2;
+    mat2[0][1] = 12.0f;
+    std::cout << (mat == mat2) << std::endl;
+
     // ---------------------------------------------------
     // VECTOR
 
