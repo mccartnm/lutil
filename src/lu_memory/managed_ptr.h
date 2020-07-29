@@ -77,6 +77,15 @@ public:
         }
     }
 
+    void reset(T *new_data) {
+        if (*this) {
+            immolate();
+
+            _refs = new int(1);
+            _ptr = new_data;
+        }
+    }
+
 private:
     int *_refs;
     T *_ptr;
@@ -95,6 +104,13 @@ public:
     {
     }
 
+    managed_ptr(const char *data)
+        : managed_ptr()
+        , _size(0)
+    {
+        this = data; // Let the operator have it
+    }
+
     explicit managed_string(size_t size)
         : managed_ptr(new char[size + 1])
         , _size(size)
@@ -107,6 +123,12 @@ public:
     }
 
     managed_string &operator= (const char *data) {
+        if (strlen(data) < _size) {
+            // We need to expand
+            _size = strlen(data);
+            reset(new char[_size + 1]);
+            memset(get(), '\0', _size + 1);
+        }
         if (_size > 0)
             memcpy(get(), data, _size);
         return *this;

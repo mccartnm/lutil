@@ -21,7 +21,7 @@ struct MyObject {
 void test_foo(util::managed_ptr<MyObject> test) {
 
     // Confirm the underlying pointer holds a non-nullptr
-    if (test.get()) {
+    if (*test) {
         // Call the managed_ptr held object through the -> operator
         Serial.println(test->foo());
     }

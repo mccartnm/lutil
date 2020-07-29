@@ -8,7 +8,7 @@ util::Map<int, const char *> mapping;
 void setup() {
     Serial.begin(115200);
     mapping.insert(1, "Test");
-    mapping.insert(65, "Another");
+    mapping[65] = "Another";
 }
 
 

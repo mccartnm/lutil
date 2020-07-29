@@ -46,8 +46,8 @@ public:
                 return _values[i];
             }
         }
-        // Error::print("Invalid Key Error");
-        return _values[0];
+        insert(key, VALUE());
+        return _values[_count - 1]; // ?!?
     }
 
     const VALUE &operator[](const KEY &key) const {
@@ -58,28 +58,38 @@ public:
                 return _values[i];
             }
         }
-        // Error::print("Invalid Key Error");
-        return VALUE();
+        insert(key, VALUE());
+        return _values[_count - 1];
     }
 
     size_t count() const { return _count; }
 
     void insert(KEY key, VALUE value) {
-        if (_size == _count) {
-            _expand(_size);
+        int idx = indexOf(key);
+        if (idx < 0) {
+            if (_size == _count) {
+                _expand(_size);
+            }
+            _keys[_count] = key;
+            _values[_count++] = value;
         }
-
-        _keys[_count] = key;
-        _values[_count++] = value;
+        else {
+            // replace an existing value
+            _values[idx] = value;
+        }
     }
 
-    bool contains(KEY key) {
-        for (size_t i = 0; i < _count; i++) {
+    int indexOf(KEY key) const {
+        for (int i = 0; i < _count; i++) {
             if (_keys[i] == key) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return -1;
+    }
+
+    bool contains(KEY key) const {
+        return (indexOf(key) >= 0);
     }
 
     void reset() {

@@ -11,20 +11,20 @@
 namespace lutil { namespace LUTIL_VERSION {
 
 
-template<size_t COLUMNS, size_t ROWS, typename T = float>
+template<size_t COLUMNS, size_t ROWS>
 class Matrix {
 public:
 
-    static Matrix<COLUMNS, ROWS, T> identity() {
-        return Matrix<COLUMNS, ROWS, T>();
+    static Matrix<COLUMNS, ROWS> identity() {
+        return Matrix<COLUMNS, ROWS>();
     }
 
     Matrix() {
         // Defaults to the identity
         for (size_t x = 0; x < _rows; x++) {
             for (size_t y = 0; y < _columns; y++) {
-                T v = y == x ? 1 : 0;
-                output._data[x][y] = v;
+                float v = y == x ? 1.0f : 0.0f;
+                _data[x][y] = v;
             }
         }
     }
@@ -32,11 +32,11 @@ public:
     size_t columns() const { return _columns; }
     size_t rows() const { return _rows; }
 
-    void set(size_t row, size_t column, const T &value) {
+    void set(size_t row, size_t column, float value) {
         _data[row][column] = value;
     }
 
-    T value(size_t row, size_t column) const {
+    float value(size_t row, size_t column) const {
         return _data[row][column];
     }
 
@@ -44,38 +44,41 @@ public:
         Proxy object to help with assignment and more fluid code
     */
     struct MatrixRow {
-        MatrixRow(Matrix<COLUMNS, ROWS, T> *trix, size_t column)
+        MatrixRow(Matrix<COLUMNS, ROWS> *trix, size_t column)
             : matrix(trix)
             , column(column)
         {}
 
-        T &operator[] (size_t row) {
-            return matrix._data[column][row];
+        float &operator[] (size_t row) {
+            return matrix->_data[column][row];
         }
 
-        const T &operator[] (size_t row) const {
-            return matrix._data[column][row];
+        const float &operator[] (size_t row) const {
+            return matrix->_data[column][row];
         }
 
-        Matrix<COLUMNS, ROWS, T> matrix;
+        Matrix<COLUMNS, ROWS> *matrix;
         size_t column;
     };
 
-    MatrixRow row(size_t column) const {
+    // TODO: This needs a const pass. Currently the [] operator
+    // doesn't have a const option (probably just need to add the
+    // available proxy (e.g. ConstMatrixRow)
+
+    MatrixRow row(size_t column) {
         // assert(column < COLUMNS);
         return MatrixRow(this, column);
     }
 
-    MatrixRow operator[] (size_t column) const {
-        return row(column)
+    MatrixRow operator[] (size_t column) {
+        return row(column);
     }
-
 
 private:
     static constexpr size_t _rows = ROWS;
     static constexpr size_t _columns = COLUMNS;
 
-    T _data[COLUMNS][ROWS];
+    float _data[COLUMNS][ROWS];
 };
 
 }

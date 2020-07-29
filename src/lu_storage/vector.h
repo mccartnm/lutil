@@ -60,6 +60,19 @@ public:
         _elements[_count++] = element;
     }
 
+    T pop(int index) {
+        if (index < 0) {
+            index = (int)_count + index;
+        }
+        if (index < 0 || index >= (int)_count) {
+            return T(); // Exception?
+        }
+
+        T val = _elements[index];
+        _remove(index);
+        return val;
+    }
+
     bool contains(const T &element) const {
         for (size_t i = 0; i < _count; ++i) {
             if (element == _elements[i])
@@ -84,6 +97,15 @@ private:
 
         _elements = new_elements;
         _size = new_size;
+    }
+
+    void _remove(size_t index) {
+        ::memmove(
+            &_elements[index],
+            &_elements[index + 1],
+            (_count - index - 1) * sizeof(T)
+        );
+        _count--;
     }
 
     size_t _size;  // Size in mem
