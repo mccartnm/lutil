@@ -1,6 +1,6 @@
 # LUTIL
 
-Tempalte utilities for embedded systems. Built for _extremely_ lightweight applications. Useful for when the STL is too heavy a cost on particular devices. Includes a number of utilities such as:
+Template utilities for embedded systems. Built for _extremely_ lightweight applications. Useful for when the STL is too heavy a cost on particular devices. Includes a number of utilities such as:
 
 
 ## Embedded Utils:
@@ -30,7 +30,7 @@ void pressed_callback() {
 
 void setup() {
     Serial.begin(115200);
-    auto &proc = Processor::get();
+    auto &proc = util::Processor::get();
     proc.add_processable(&my_button); // Register button
     proc.init(); // Initialize elements
 
@@ -41,7 +41,7 @@ void setup() {
 }
 
 void loop() {
-    Processor::get().process(); // Event-style loop
+    util::Processor::get().process(); // Event-style loop
 }
 ```
 You can create your own `Processable` classes with callbacks right from the `lutil` api.
@@ -75,11 +75,12 @@ Sensor gryo;
 Sensor accel;
 Sensor magno;
 
-id_map.insert("gryo", &gryo);
-id_map.insert("accel", &accel);
-id_map.insert("magno", &mango);
+// Insert some values
+id_map["gryo"] = &gryo;
+id_map["accel"] = &accel;
+id_map["magno"] = &mango;
 
-Serial.println(id_map["gryo"].sensor_name); // e.g. LSM9DS1
+Serial.println(id_map["gryo"]->sensor_name); // e.g. LSM9DS1
 ```
 
 ### matrix (`Matrix`)
