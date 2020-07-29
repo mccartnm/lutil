@@ -8,11 +8,10 @@ namespace lutil {
 namespace LUTIL_VERSION {
 
 /*
-    _Very_ lightweight map template with linked lists
+    Lightweight map template with linked lists. Not as performant
+    as other models but very light on the compilation side
 
-    - Both keys and values have to have default
-      constructors
-    - Currently - there is no removal :D TODO
+    - VALUE needs a default constructor
 */
 template<typename KEY, typename VALUE>
 class Map {
@@ -23,7 +22,6 @@ public:
 
         _keys = new KEY[_size];
         _values = new VALUE[_size];
-        reset();
     }
 
     Map() {
@@ -32,7 +30,6 @@ public:
 
         _keys = new KEY[_size];
         _values = new VALUE[_size];
-        reset();
     }
 
     ~Map() {
@@ -65,7 +62,7 @@ public:
     size_t count() const { return _count; }
 
     void insert(KEY key, VALUE value) {
-        int idx = indexOf(key);
+        int idx = _index_of(key);
         if (idx < 0) {
             if (_size == _count) {
                 _expand(_size);
@@ -79,24 +76,17 @@ public:
         }
     }
 
-    int indexOf(KEY key) const {
-        for (int i = 0; i < _count; i++) {
-            if (_keys[i] == key) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     bool contains(KEY key) const {
-        return (indexOf(key) >= 0);
+        return (_index_of(key) >= 0);
     }
 
-    void reset() {
-        for (size_t i = 0; i < _size; ++i) {
-            _keys[i] = KEY();
-            _values[i] = VALUE();
-        }
+
+    void remove(KEY key) {
+        int index = _index_of(key);
+        if (index < 0)
+            return; // Don't have it
+
+        _remove(index);
     }
 
 
@@ -116,6 +106,29 @@ private:
         _keys = new_keys;
         _values = new_values;
         _size = new_size;
+    }
+
+    int _index_of(KEY key) const {
+        for (int i = 0; i < _count; i++) {
+            if (_keys[i] == key) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    void _remove(size_t index) {
+        ::memmove(
+            &_keys[index],
+            &_keys[index + 1],
+            (_count - index - 1) * sizeof(KEY)
+        );
+        ::memmove(
+            &_values[index],
+            &_values[index + 1],
+            (_count - index - 1) * sizeof(VALUE)
+        );
+        _count--;
     }
 
     size_t _size;
