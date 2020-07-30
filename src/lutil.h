@@ -13,4 +13,12 @@
 #endif
 #endif
 
-namespace lutil { namespace LUTIL_VERSION {} }
+#define LUTIL_FLOAT_EPSILON -1e8
+
+namespace lutil { namespace LUTIL_VERSION {
+
+bool fuzzy_match(float a, float b) {
+    return (fabs(a - b) < LUTIL_FLOAT_EPSILON);
+}
+
+} }

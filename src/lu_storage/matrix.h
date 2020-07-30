@@ -8,6 +8,14 @@
 #pragma once
 #include "lutil.h"
 
+#define _SCALAR_MATRIX_OP(op)            \
+    for (int x = 0; x < COLUMNS; x++) {  \
+        for (int y = 0; y < ROWS; y++) { \
+            _data[x][y] op scalar;       \
+        }                                \
+    }                                    \
+    return *this;
+
 namespace lutil { namespace LUTIL_VERSION {
 
 
@@ -74,15 +82,22 @@ public:
         return row(column);
     }
 
+    Matrix<COLUMNS, ROWS> &operator*=(float scalar) { _SCALAR_MATRIX_OP(*=); }
+    Matrix<COLUMNS, ROWS> &operator/=(float scalar) { _SCALAR_MATRIX_OP(/=); }
+
     bool operator== (const Matrix<COLUMNS, ROWS> &other) const {
         for (int x = 0; x < COLUMNS; x++) {
             for (int y = 0; y < ROWS; y++) {
                 // Probably need a fuzzy match
-                if (_data[COLUMNS][ROWS] != other._data[COLUMNS][ROWS])
+                if (!fuzzy_match(_data[x][y], other._data[x][y]))
                     return false;
             }
         }
         return true;
+    }
+
+    bool operator!= (const Matrix<COLUMNS, ROWS> &other) const {
+        return !(*this == other);
     }
 
 private:
