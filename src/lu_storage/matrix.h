@@ -49,7 +49,14 @@ public:
     }
 
     /*
-        Proxy object to help with assignment and more fluid code
+        Proxy object to make assignment quicker.
+        With this you can do things like:
+
+        Matrix<4, 4> mat;
+        mat[2][3] = 123;
+
+        Matrix<4, 4>::MatrixRow r2 = mat[1];
+        r2[0] = 44.5;
     */
     struct MatrixRow {
         MatrixRow(Matrix<COLUMNS, ROWS> *trix, size_t column)
@@ -69,10 +76,6 @@ public:
         size_t column;
     };
 
-    // TODO: This needs a const pass. Currently the [] operator
-    // doesn't have a const option (probably just need to add the
-    // available proxy (e.g. ConstMatrixRow)
-
     MatrixRow row(size_t column) {
         // assert(column < COLUMNS);
         return MatrixRow(this, column);
@@ -80,6 +83,11 @@ public:
 
     MatrixRow operator[] (size_t column) {
         return row(column);
+    }
+
+    // I don't love the const cast but it beats adding a ConstMatrixRow
+    const MatrixRow operator[] (size_t column) const {
+        return MatrixRow(const_cast<Matrix<COLUMNS, ROWS> *>(this), column);
     }
 
     Matrix<COLUMNS, ROWS> &operator*=(float scalar) { _SCALAR_MATRIX_OP(*=); }
