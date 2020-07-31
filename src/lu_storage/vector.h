@@ -31,11 +31,24 @@ public:
         reset();
     }
 
-    // Vec(const Vec &);
-    // Vec(Vec &&);
     ~Vec() {
         delete [] _elements;
     }
+
+    Vec(const Vec<T> &other)
+        : _count(other._count)
+        , _size(other._size)
+    {
+        _from_other(other);
+    }
+
+    Vec &operator= (const Vec<T> &other) {
+        _count = other._count;
+        _size = other._size;
+        _from_other(other);
+        return *this;
+    }
+
 
     T &operator[](size_t index) {
         // Should we have some form of error?
@@ -106,6 +119,11 @@ private:
             (_count - index - 1) * sizeof(T)
         );
         _count--;
+    }
+
+    void _from_other(const Vec<T> &other) {
+        _elements = new T[_size];
+        ::memcpy(_elements, other._elements, _size);
     }
 
     size_t _size;  // Size in mem

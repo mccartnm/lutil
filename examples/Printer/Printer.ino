@@ -20,7 +20,7 @@ float x, y, z = 0;
 void setup() {}
 
 void loop() {
-    util::Printer::print("x: % y: % z: %", x, y, z);
+    util::Printer::print("x: % y: % z: %\n", x, y, z);
 
     x++; 
     y--; 

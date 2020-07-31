@@ -37,13 +37,28 @@ public:
         delete [] _values;
     }
 
+    Map(const Map<KEY, VALUE> &other)
+        : _count(other._count)
+        , _size(other._size)
+    {
+        _from_other(other);
+    }
+
+    Map &operator= (const Map<KEY, VALUE> &other) {
+        _count = other._count;
+        _size = other._size;
+        _from_other(other);
+        return *this;
+    }
+
     VALUE &operator[](KEY key) {
         for (size_t i = 0; i < _count; i++) {
             if (_keys[i] == key) {
                 return _values[i];
             }
         }
-        insert(key, VALUE());
+        auto v = VALUE();
+        insert(key, v); // EMPTY MAP MIGHT EXPLODE WHEN DESTROYED __START_HERE__
         return _values[_count - 1]; // ?!?
     }
 
@@ -61,7 +76,7 @@ public:
 
     size_t count() const { return _count; }
 
-    void insert(KEY key, VALUE value) {
+    void insert(KEY key, const VALUE &value) {
         int idx = _index_of(key);
         if (idx < 0) {
             if (_size == _count) {
@@ -87,6 +102,72 @@ public:
             return; // Don't have it
 
         _remove(index);
+    }
+
+
+    // ----------------------------------------------------------------
+    // ITERATION
+
+    class Iterator {
+    public:
+        Iterator(Map<KEY, VALUE> *map, int index = 0)
+            : _map(map)
+            , _index(index)
+        {}
+
+        Iterator(const Iterator &it)
+            : _map(it._map)
+            , _index(it._index)
+        {}
+
+        KEY &key() {
+            return _map->_keys[_index];
+        }
+
+        VALUE &value() {
+            return _map->_values[_index];
+        }
+
+        Iterator &operator++ () {
+            _index++;
+            return *this;
+        }
+
+        Iterator operator++ (int) {
+            Iterator output(*this);
+            ++(*this);
+            return output;
+        }
+
+        bool has_next() const {
+            return _index < _count;
+        }
+
+        bool operator== (const Iterator &other) const {
+            return (this->_map == other._map &&
+                    this->_index == other._index);
+        }
+
+        bool operator!= (const Iterator &other) const {
+            return (this->_map != other._map ||
+                    this->_index != other._index);
+        }
+
+        bool operator!= (const Iterator *other) const {
+            return (this != *other);
+        }
+
+    private:
+        Map<KEY, VALUE> *_map;
+        size_t _index;
+    };
+
+    Iterator begin() {
+        return Iterator(this);
+    }
+
+    Iterator end() {
+        return Iterator(this, (int)_count);
     }
 
 
@@ -129,6 +210,14 @@ private:
             (_count - index - 1) * sizeof(VALUE)
         );
         _count--;
+    }
+
+    void _from_other(const Map<KEY, VALUE> &other) {
+        _keys = new KEY[_size];
+        _values = new VALUE[_size];
+
+        ::memcpy(_keys, other._keys, _size);
+        ::memcpy(_values, other._values, _size);
     }
 
     size_t _size;

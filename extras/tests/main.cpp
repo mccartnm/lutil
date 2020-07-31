@@ -6,7 +6,26 @@
 #include "lu_storage/vector.h"
 #include "lu_storage/map.h"
 
+#include "lu_state/state.h"
+
 using namespace lutil::v_1;
+
+
+enum class State {
+    Off,
+    Boot,
+    Running,
+    Cooldown,
+    Error,
+    _COUNT
+};
+
+
+class MyStateMachine : public StateDriver<MyStateMachine, State>
+{
+public:
+    bool test() { return true; }
+};
 
 int main(int argc, char const *argv[])
 {
@@ -48,6 +67,14 @@ int main(int argc, char const *argv[])
     map.remove(44);
     std::cout << (map.contains(44) ? "y": "n") << std::endl;    
     std::cout << (map.contains(1) ? "y": "n") << std::endl;    
+
+    // ---
+    // STATE MACHINE
+    MyStateMachine machine;
+    machine.add_transition(State::Off, State::Boot, &MyStateMachine::test);
+
+    machine.process();
+    std::cout << (int)machine.current_state() << std::endl;
 
     // To keep the console
     throw std::runtime_error("foo");
