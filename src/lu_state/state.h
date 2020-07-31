@@ -14,6 +14,16 @@ public:
 };
 
 
+/*
+    This is a CRTP to keep higher-level code to a minimum
+    - https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
+
+    A well defined state machine template utility. Scales larger than
+    the typical switch statement utility and allows for explicit definition
+    of flow outside of the class definition. This means we can handle the
+    state transitions in an abstract way and "program" it more toward
+    runtime.
+*/
 template<class Derived, typename St, size_t Initial = 0>
 class StateDriver : public _AbstractDriver {
 public:

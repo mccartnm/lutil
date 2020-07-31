@@ -8,9 +8,6 @@ namespace lutil { namespace LUTIL_VERSION {
 
 /*
     _Very_ lightweight vector template
-
-    - TODO: Inline these functions? Probably.
-    - Element removal
 */
 template<typename T>
 class Vec {
