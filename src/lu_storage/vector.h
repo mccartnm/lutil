@@ -94,9 +94,66 @@ public:
         return false;
     }
 
-    // Maybe... C++11 might be good enough
-    // Vec<T>& operator=(const Vec<T> &);
-    // Vec<T>& operator=(Vec<T> &&);
+    // ----------------------------------------------------------------
+    // ITERATION
+
+    class Iterator {
+    public:
+        Iterator(Vec<T> *vec, int index = 0)
+            : _vec(vec)
+            , _index(index)
+        {}
+
+        Iterator(const Iterator &it)
+            : _vec(it._vec)
+            , _index(it._index)
+        {}
+
+        T operator* () {
+            return _vec->_elements[_index];
+        }
+
+        Iterator &operator++ () {
+            _index++;
+            return *this;
+        }
+
+        Iterator operator++ (int) {
+            Iterator output(*this);
+            ++(*this);
+            return output;
+        }
+
+        bool has_next() const {
+            return _index < _vec->_count;
+        }
+
+        bool operator== (const Iterator &other) const {
+            return (this->_vec == other._vec &&
+                    this->_index == other._index);
+        }
+
+        bool operator!= (const Iterator &other) const {
+            return (this->_vec != other._vec ||
+                    this->_index != other._index);
+        }
+
+        bool operator!= (const Iterator *other) const {
+            return (this != *other);
+        }
+
+    private:
+        Vec<T> *_vec;
+        size_t _index;
+    };
+
+    Iterator begin() {
+        return Iterator(this);
+    }
+
+    Iterator end() {
+        return Iterator(this, (int)_count);
+    }
 
 private:
     void _expand(size_t size) {

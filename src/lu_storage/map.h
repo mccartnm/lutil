@@ -140,7 +140,7 @@ public:
         }
 
         bool has_next() const {
-            return _index < _count;
+            return _index < _map->_count;
         }
 
         bool operator== (const Iterator &other) const {

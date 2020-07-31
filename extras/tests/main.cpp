@@ -50,6 +50,11 @@ int main(int argc, char const *argv[])
     vector.push(1.0);
     vector.push(4.0);
 
+    auto it = vector.begin();
+    for (; it != vector.end(); it++) {
+        std::cout << (*it) << std::endl;
+    }
+
     std::cout  << vector.pop(2) << std::endl; // == 4.0
     std::cout  << vector.pop(-1) << std::endl; // == 1.0
 
