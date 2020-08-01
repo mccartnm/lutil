@@ -27,6 +27,7 @@ set (LUTIL_HEADERS
     src/lu_storage/map.h
     src/lu_storage/matrix.h
     src/lu_storage/vector.h
+    src/lu_state/state.h
 )
 
 # set (LUTIL_SOURCES) # Nothing yet

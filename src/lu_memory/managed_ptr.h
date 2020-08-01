@@ -80,10 +80,9 @@ public:
     void reset(T *new_data) {
         if (*this) {
             immolate();
-
-            _refs = new int(1);
-            _ptr = new_data;
         }
+        _refs = new int(1);
+        _ptr = new_data;
     }
 
 private:
@@ -104,11 +103,11 @@ public:
     {
     }
 
-    managed_ptr(const char *data)
+    managed_string(const char *data)
         : managed_ptr()
         , _size(0)
     {
-        this = data; // Let the operator have it
+        *this = data; // Let the operator have it
     }
 
     explicit managed_string(size_t size)
@@ -122,15 +121,22 @@ public:
         return (strncmp(c_str(), data, _size) == 0);
     }
 
+    bool operator==(const managed_string &other) const {
+        if (_size != other._size)
+            return false;
+        return (strncmp(c_str(), other.c_str(), _size) == 0);
+    }
+
     managed_string &operator= (const char *data) {
-        if (strlen(data) < _size) {
+        if (strlen(data) > _size) {
             // We need to expand
             _size = strlen(data);
             reset(new char[_size + 1]);
-            memset(get(), '\0', _size + 1);
         }
-        if (_size > 0)
-            memcpy(get(), data, _size);
+        if (_size > 0) {
+            ::memset(get(), '\0', _size + 1);
+            ::memcpy(get(), data, _size);
+        }
         return *this;
     }
 
@@ -138,7 +144,7 @@ public:
     size_t size() const { return _size; }
 
 private:
-    int _size;
+    size_t _size;
 };
 
 
@@ -172,7 +178,7 @@ public:
     size_t size() const { return _size; }
 
 private:
-    int _size;
+    size_t _size;
 };
 
 }

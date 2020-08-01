@@ -105,6 +105,16 @@ public:
     }
 
 
+    KEY key_from_value(VALUE val) const {
+        for (int i = 0; i < _count; i++) {
+            if (_values[i] == val) {
+                return _keys[i];
+            }
+        }
+        return KEY();
+    }
+
+
     // ----------------------------------------------------------------
     // ITERATION
 

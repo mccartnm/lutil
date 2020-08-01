@@ -14,6 +14,8 @@
 #include "lutil.h"
 #include "lu_storage/matrix.h"
 
+using namespace lutil::v_1;
+
 Matrix<4, 4> mat;
 
 void setup() {

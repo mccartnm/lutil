@@ -11,17 +11,7 @@
 using namespace lutil::v_1;
 
 
-enum class State {
-    Off,
-    Boot,
-    Running,
-    Cooldown,
-    Error,
-    _COUNT
-};
-
-
-class MyStateMachine : public StateDriver<MyStateMachine, State>
+class MyStateMachine : public StateDriver<MyStateMachine>
 {
 public:
     bool test() { return true; }
@@ -76,10 +66,10 @@ int main(int argc, char const *argv[])
     // ---
     // STATE MACHINE
     MyStateMachine machine;
-    machine.add_transition(State::Off, State::Boot, &MyStateMachine::test);
+    machine.add_transition("Off", "Boot", &MyStateMachine::test);
 
     machine.process();
-    std::cout << (int)machine.current_state() << std::endl;
+    std::cout << "The State: " << machine.current_state().c_str() << std::endl;
 
     // To keep the console
     throw std::runtime_error("foo");
