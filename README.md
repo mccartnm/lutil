@@ -47,6 +47,9 @@ void loop() {
 You can create your own `Processable` classes with callbacks right from the `lutil` api.
 
 
+### State Machine (`StateDriver`)
+A state machine defintion class. This helps create a clear understanding of a systems state and runtime. This is a more complex topic so refer to the [example](./examples/StateMachine/StateMachine.ino).
+
 ## Storage
 
 ### vector (`Vec`)
