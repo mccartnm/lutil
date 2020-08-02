@@ -16,6 +16,10 @@ class MyStateMachine : public StateDriver<MyStateMachine>
 {
 public:
     bool test() { return true; }
+
+    BEGIN_DRIVER_DEFINITION
+        TRANSITION(MyStateMachine, test);
+    END_DRIVER_DEFINITION
 };
 
 int main(int argc, char const *argv[])

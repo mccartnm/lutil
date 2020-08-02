@@ -82,6 +82,14 @@ public:
 
 private:
     bool _on;
+
+    // I would give my first born for reflection to be in the
+    // standard already... one day...
+    BEGIN_DRIVER_DEFINITION
+        TRANSITION(DigitalSwitch, check_on);
+        TRANSITION(DigitalSwitch, check_off);
+        RUNTIME(DigitalSwitch, while_on);
+    END_DRIVER_DEFINITION
 };
 
 // Create out digital switch instance

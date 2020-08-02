@@ -7,6 +7,8 @@
 #include "lu_process/process.h"
 #include "lu_memory/managed_ptr.h"
 
+#include "lu_state/state_macros.h"
+
 namespace lutil { namespace LUTIL_VERSION {
 
 /*
@@ -45,6 +47,7 @@ public:
 
     StateDriver() {
         _current_state = _initial_state();
+        _register_machine();
     }
 
     managed_string current_state() const {
@@ -81,10 +84,15 @@ public:
     }
 
     void process() override {
+        //
+        // First, we execute the runtimes associated with this state
+        //
         if (_runtimes.contains(_current_state)) {
+
             Vec<RuntimeFunction> &runtimes = _runtimes[_current_state];
             auto it = runtimes.begin();
             uint16_t original_state = _current_state;
+
             for (; it != runtimes.end(); it++) {
                 Derived *self = static_cast<Derived *>(this);
                 RuntimeFunction &func = *it;
@@ -96,6 +104,10 @@ public:
             }
         }
 
+        //
+        // Then, pending the state hasn't changed via the runtimes,
+        // we check for a transition predicate.
+        //
         if (_predicates.contains(_current_state)) {
             PredicateMap &map = _predicates[_current_state];
             auto it = map.begin();
@@ -111,6 +123,20 @@ public:
 
         }
     }
+
+protected:
+    /*
+        Toolkit for the eventual dynamic declaration of state
+        transitions - that way we can move more logic out
+    */
+    virtual void _register_machine() {}
+    void _register_runtime(managed_string name, RuntimeFunction func) {
+        _reg_runtime[name].push(func);
+    }
+    void _register_transition(managed_string name, TransitionPredicate predicate) {
+        _reg_transitions[name].push(predicate);
+    }
+
 
 private:
     uint16_t _state_id(managed_string state) {
@@ -142,6 +168,10 @@ private:
     Map<managed_string, uint16_t> _known_states;
     Map<uint16_t, PredicateMap> _predicates;
     Map<uint16_t, Vec<RuntimeFunction>> _runtimes;
+
+
+    Map<managed_string, Vec<TransitionPredicate>> _reg_transitions;
+    Map<managed_string, Vec<RuntimeFunction>> _reg_runtime;
 };
 
 }
