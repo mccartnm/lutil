@@ -1,5 +1,23 @@
 /*
     Example of a state machine using the lutil framework
+
+    A lutil StateDriver is a spin on a traditional state machine and
+    has two main types of functionality.
+
+    Transitions:
+        - The "test" code run to see if the machine is ready to swtch
+        from one state to another. This is useful when one state doesn't
+        know what other states exist
+
+    Runtimes:
+        - Code that's run while in a given state. This can also alter the
+        state of the machine to change which runtimes/transitions are
+        active.
+
+    If this is a bit confusing, consider the following example. We have
+    a digital switch that will adjust it's state whenever a push button
+    is pressed. There is a runtime for the On state to fade the Led in
+    and out.
 */
 #include "lutil.h"
 #include "lu_state/state.h"
@@ -11,7 +29,8 @@ Button<5> go_button;  // Basic push button on pin 5
 Led on_light(9);      // Basic single color LED on pin 9
 
 /*
-    Example states available
+    Example states available. These can be any string you'd like and
+    there is no state size limit.
 */
 constexpr char Off[] = "Off";
 constexpr char On[] = "On";
@@ -22,7 +41,20 @@ public:
     explicit DigitalSwitch()
         : StateDriver<DigitalSwitch>()
         , _on(false)
-    {}
+    {
+        //
+        // Define our state machine transitions
+        //
+
+        // Off -> On : An odd button press
+        add_transition(Off, On, &DigitalSwitch::check_on);
+
+        // While in the On state...
+        add_runtime(On, &DigitalSwitch::while_on);
+
+        // On -> Off : An even button press
+        add_transition(On, Off, &DigitalSwitch::check_off);
+    }
 
     // TRANSITION FUNCTIONS
 
@@ -37,43 +69,25 @@ public:
     bool check_off() {
         // Only called when in the On state
         _on = !(go_button.state() == ButtonState::Pressed);
-        if (!_on)
+        if (!_on) {
             Serial.println("SET OFF");
+            on_light.set_value(0); // Disable the light
+        }
         return !_on;
     }
-
 
     // RUNTIME FUNCTIONS
 
     void while_on() { on_light.fade(1000); }
-
-    void while_off() { on_light.set_value(0); }
-
 
 private:
     bool _on;
 };
 
 // Create out digital switch instance
-DigitalSwitch eng;
+DigitalSwitch sw;
 
 void setup() {
-    // Define our state machine transitions
-
-    // Off -> On : An odd button press
-    eng.add_transition(
-        Off, On,
-        &DigitalSwitch::check_on
-    );
-    eng.add_runtime(On, &DigitalSwitch::while_on);
-
-    // On -> Off : An even button press
-    eng.add_transition(
-        On, Off,
-        &DigitalSwitch::check_off
-    );
-    eng.add_runtime(Off, &DigitalSwitch::while_off);
-
     // Combine the button process with the state machine
     // via the lutil Processor. This allows for a clean event
     // loop and avoids additional coupling between the button
@@ -83,8 +97,16 @@ void setup() {
 
 
 void loop() {
+    //
     // This is it! We don't need anything extra. The processor
     // will do all the work
+    //
+    // The Button and DigitalSwitch are Processables which automatically
+    // register themselves with the global Processor instance when they
+    // are constructed. This process loop will handle the events that
+    // we want to work with without having to overload the .ino with
+    // boilerplate
+    //
     Processor::get().process();
     delay(5); // Not required. Just lighten the sim a little
 }

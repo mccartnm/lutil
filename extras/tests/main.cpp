@@ -5,6 +5,7 @@
 #include "lu_storage/matrix.h"
 #include "lu_storage/vector.h"
 #include "lu_storage/map.h"
+#include "lu_process/process.h"
 
 #include "lu_state/state.h"
 
@@ -68,7 +69,8 @@ int main(int argc, char const *argv[])
     MyStateMachine machine;
     machine.add_transition("Off", "Boot", &MyStateMachine::test);
 
-    machine.process();
+    Processor::get().init();
+    Processor::get().process();
     std::cout << "The State: " << machine.current_state().c_str() << std::endl;
 
     // To keep the console

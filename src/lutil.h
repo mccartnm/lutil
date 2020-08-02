@@ -31,6 +31,7 @@ enum class RGB {
     Blue,
 };
 
+#ifndef _TEST_CORE_
 /*
     Dynamically setup an RGB LED without having to consume
     global variables.
@@ -100,5 +101,6 @@ struct Led {
 private:
     uint8_t _pin;
 };
+#endif
 
 } }
