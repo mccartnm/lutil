@@ -1,3 +1,4 @@
+#pragma once
 #include "lutil.h"
 
 namespace lutil {
@@ -5,7 +6,7 @@ namespace lutil {
 namespace LUTIL_VERSION {
 
 template<typename T>
-void swap_ptr(T **a, T **b)
+inline void swap_ptr(T **a, T **b)
 {
     T *temp = *a;
     *a = *b;
@@ -164,7 +165,7 @@ public:
     }
 
     uint8_t operator[](int index) const {
-        if (index >= _size) {
+        if (index >= (int)_size) { // :|
             return 0; // Failsafe
         }
         return *(get() + index);

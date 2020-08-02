@@ -22,7 +22,8 @@ set (LUTIL_HEADERS
     src/lutil.h
     src/lu_memory/managed_ptr.h
 
-    # src/lu_process (embedded only)
+    src/lu_process/process.h   # Non uC spec
+    src/lu_process/process.cpp # Non uC spec
 
     src/lu_storage/map.h
     src/lu_storage/matrix.h

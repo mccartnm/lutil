@@ -38,8 +38,8 @@ public:
     }
 
     Map(const Map<KEY, VALUE> &other)
-        : _count(other._count)
-        , _size(other._size)
+        : _size(other._size)
+        , _count(other._count)
     {
         _from_other(other);
     }
@@ -106,7 +106,7 @@ public:
 
 
     KEY key_from_value(VALUE val) const {
-        for (int i = 0; i < _count; i++) {
+        for (size_t i = 0; i < _count; i++) {
             if (_values[i] == val) {
                 return _keys[i];
             }
@@ -188,10 +188,10 @@ private:
         KEY *new_keys = new KEY[new_size];
         VALUE *new_values = new VALUE[new_size];
 
-        memcpy(new_keys, _keys, _size);
+        ::memcpy(new_keys, _keys, _size);
         delete [] _keys;
         
-        memcpy(new_values, _values, _size);
+        ::memcpy(new_values, _values, _size);
         delete [] _values;
 
         _keys = new_keys;
@@ -200,7 +200,7 @@ private:
     }
 
     int _index_of(KEY key) const {
-        for (int i = 0; i < _count; i++) {
+        for (int i = 0; i < (int)_count; i++) {
             if (_keys[i] == key) {
                 return i;
             }

@@ -4,6 +4,7 @@
 #pragma once
 #include "lutil.h"
 #include "lu_storage/map.h"
+#include "lu_process/process.h"
 #include "lu_memory/managed_ptr.h"
 
 namespace lutil { namespace LUTIL_VERSION {
@@ -14,9 +15,11 @@ namespace lutil { namespace LUTIL_VERSION {
     Without this, the template class below becomes more challenging to
     build into more complex systems (plug-n-play, etc.)
 */
-class _AbstractDriver {
+class _AbstractDriver : public Processable {
 public:
-    _AbstractDriver() {}
+    _AbstractDriver() : Processable() {}
+
+    void init() override {}
 
 protected:
     virtual const char *initial_state() const { return "Off"; }
@@ -48,6 +51,15 @@ public:
         return _known_states.key_from_value(_current_state);
     }
 
+    bool add_runtime(managed_string state, RuntimeFunction func) {
+        uint16_t state_id = _state_id(state);
+        if (!_runtimes.contains(state_id)) {
+            _runtimes[state_id] = {};
+        }
+        _runtimes[state_id].push(func);
+        return true;
+    }
+
     bool add_transition(
         managed_string from_state,
         managed_string to_state,
@@ -68,7 +80,22 @@ public:
         return true;
     }
 
-    void process() {
+    void process() override {
+        if (_runtimes.contains(_current_state)) {
+            Vec<RuntimeFunction> &runtimes = _runtimes[_current_state];
+            auto it = runtimes.begin();
+            uint16_t original_state = _current_state;
+            for (; it != runtimes.end(); it++) {
+                Derived *self = static_cast<Derived *>(this);
+                RuntimeFunction &func = *it;
+                (self->*func)();
+                if (_current_state != original_state) {
+                    // last runtime has changed the state
+                    return;
+                }
+            }
+        }
+
         if (_predicates.contains(_current_state)) {
             PredicateMap &map = _predicates[_current_state];
             auto it = map.begin();

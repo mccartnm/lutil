@@ -33,8 +33,8 @@ public:
     }
 
     Vec(const Vec<T> &other)
-        : _count(other._count)
-        , _size(other._size)
+        : _size(other._size)
+        , _count(other._count)
     {
         _from_other(other);
     }
@@ -106,7 +106,7 @@ public:
             , _index(it._index)
         {}
 
-        T operator* () {
+        T &operator* () {
             return _vec->_elements[_index];
         }
 
