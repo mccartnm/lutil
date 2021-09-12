@@ -7,7 +7,7 @@
 
 #define DEBOUNCE_DELAY 50 // ms
 
-namespace lutil { namespace LUTIL_VERSION {
+namespace lutil {
 
 enum class ButtonState {
     Pressed,   // CALLBACK CAPABLE
@@ -108,4 +108,4 @@ private:
     bool _last_read;
 };
 
-} }
+}

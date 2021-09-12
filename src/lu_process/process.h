@@ -4,7 +4,7 @@
 #include "lu_storage/vector.h"
 #include "lu_storage/map.h"
 
-namespace lutil { namespace LUTIL_VERSION {
+namespace lutil {
 
 class Processable;
 
@@ -42,5 +42,4 @@ private:
     Map<int, Vec<ProcessCallback>> _callbacks;
 };
 
-}
 }

@@ -1,22 +1,48 @@
 #pragma once
 #include "lutil.h"
 
+
+
 #define DEFAULT_SIZE 5
 
-namespace lutil { namespace LUTIL_VERSION {
-
+namespace lutil {
 
 /*
-    _Very_ lightweight vector template
 */
 template<typename T>
+class Alloc {
+public:
+    Alloc() {};
+
+    T *allocate(size_t size) {
+        return new T[size];
+    }
+
+    void deallocate(T *data) {
+        delete[] data;
+    }
+
+    void copy(T *dest, T *source, size_t size) {
+        for (size_t i = 0; i < size; i++)
+            *(dest + i) = *(source + i);
+    }
+
+    void remove(T *elements, size_t index, size_t count) {
+        for (size_t i = index; i < count - 1; i++)
+            elements[i] = elements[i + 1];
+        elements[count - 1] = T(); // Nuke the last element
+    }
+};
+
+/* _Very_ lightweight vector template */
+template<typename T, typename A = Alloc<T>>
 class Vec {
 public:
     explicit Vec(size_t size) {
         _count = size;
         _size = _count;
 
-        _elements = new T[_size];
+        _elements = _alloc.allocate(_size);
         reset();
     }
 
@@ -24,12 +50,12 @@ public:
         _count = 0;
         _size = DEFAULT_SIZE;
 
-        _elements = new T[_size];
+        _elements = _alloc.allocate(_size);
         reset();
     }
 
     ~Vec() {
-        delete [] _elements;
+        _alloc.deallocate(_elements);
     }
 
     Vec(const Vec<T> &other)
@@ -45,7 +71,6 @@ public:
         _from_other(other);
         return *this;
     }
-
 
     T &operator[](size_t index) {
         // Should we have some form of error?
@@ -63,7 +88,14 @@ public:
 
     size_t count() const { return _count; }
 
-    void push(T element) {
+    void push(const T& element) {
+        if (_size == _count) {
+            _expand(_size);
+        }
+        _elements[_count++] = element;
+    }
+
+    void push(T&& element) {
         if (_size == _count) {
             _expand(_size);
         }
@@ -156,35 +188,31 @@ private:
     void _expand(size_t size) {
         auto new_size = _size + size;
 
-        T *new_elements = new T[new_size];
+        T *new_elements = _alloc.allocate(new_size);
 
         // Copy from one to the other
-        ::memcpy(new_elements, _elements, _size);
-        delete [] _elements;
+        _alloc.copy(new_elements, _elements, _size);
+        _alloc.deallocate(_elements);
 
         _elements = new_elements;
         _size = new_size;
     }
 
     void _remove(size_t index) {
-        ::memmove(
-            &_elements[index],
-            &_elements[index + 1],
-            (_count - index - 1) * sizeof(T)
-        );
+        _alloc.remove(_elements, index, _count);
         _count--;
     }
 
     void _from_other(const Vec<T> &other) {
-        _elements = new T[_size];
-        ::memcpy(_elements, other._elements, _size);
+        _elements = _alloc.allocate(_size);
+        _alloc.copy(_elements, other._elements, _size);
     }
 
     size_t _size;  // Size in mem
     size_t _count; // Number of elements
 
     T *_elements;
+    A _alloc;
 };
 
-}
 }

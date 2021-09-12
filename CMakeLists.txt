@@ -21,14 +21,18 @@ add_definitions("-D_TEST_CORE_")
 set (LUTIL_HEADERS
     src/lutil.h
     src/lu_memory/managed_ptr.h
+    src/lu_memory/abstract_memory.h
 
-    src/lu_process/process.h   # Non uC spec
-    src/lu_process/process.cpp # Non uC spec
+    # src/lu_process/process.h   # Non uC spec
+    # src/lu_process/process.cpp # Non uC spec
 
+    # src/lu_control/pid.h
+    # src/lu_control/pid.cpp
+
+    src/lu_math/matrix.h
     src/lu_storage/map.h
-    src/lu_storage/matrix.h
     src/lu_storage/vector.h
-    src/lu_state/state.h
+    # src/lu_state/state.h
 )
 
 # set (LUTIL_SOURCES) # Nothing yet

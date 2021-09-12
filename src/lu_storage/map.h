@@ -5,8 +5,6 @@
 
 namespace lutil {
 
-namespace LUTIL_VERSION {
-
 /*
     Lightweight map template with linked lists. Not as performant
     as other models but very light on the compilation side
@@ -188,11 +186,16 @@ private:
         KEY *new_keys = new KEY[new_size];
         VALUE *new_values = new VALUE[new_size];
 
-        ::memcpy(new_keys, _keys, _size);
-        delete [] _keys;
+        for (size_t i = 0; i < _count; i++)
+        {
+            new_keys[i] = _keys[i];
+            new_values[i] = _values[i];
+        }
+        // ::memcpy(new_keys, _keys, _size);
+        // delete [] _keys;
         
-        ::memcpy(new_values, _values, _size);
-        delete [] _values;
+        // ::memcpy(new_values, _values, _size);
+        // delete [] _values;
 
         _keys = new_keys;
         _values = new_values;
@@ -209,25 +212,27 @@ private:
     }
 
     void _remove(size_t index) {
-        ::memmove(
-            &_keys[index],
-            &_keys[index + 1],
-            (_count - index - 1) * sizeof(KEY)
-        );
-        ::memmove(
-            &_values[index],
-            &_values[index + 1],
-            (_count - index - 1) * sizeof(VALUE)
-        );
+        for (size_t i = index; i < _count - 1; i++)
+        {
+            _keys[i] = _keys[i + 1];
+            _values[i] = _values[i + 1];
+        }
+        _keys[_count - 1] = KEY();
+        _values[_count - 1] = VALUE();
         _count--;
     }
 
     void _from_other(const Map<KEY, VALUE> &other) {
+        _size = other._size;
+        _count = other._count;
         _keys = new KEY[_size];
         _values = new VALUE[_size];
 
-        ::memcpy(_keys, other._keys, _size);
-        ::memcpy(_values, other._values, _size);
+        for (size_t i = 0; i < _count; i++)
+        {
+            _keys[i] = other._keys[i];
+            _values[i] = other._values[i];
+        }
     }
 
     size_t _size;
@@ -237,7 +242,5 @@ private:
     VALUE *_values;
 };
 
-
-}
 
 }

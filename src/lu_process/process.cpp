@@ -1,6 +1,6 @@
 #include "process.h"
 
-namespace lutil { namespace LUTIL_VERSION {
+namespace lutil {
 
 Processor &Processor::get() {
     static Processor *instance = nullptr;
@@ -54,5 +54,4 @@ void Processable::event(int trigger) {
     }
 }
 
-}
 }
