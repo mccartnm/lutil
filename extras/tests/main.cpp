@@ -2,76 +2,70 @@
 #include <iostream>
 
 #include "lutil.h"
-#include "lu_storage/matrix.h"
+#include "lu_memory/managed_ptr.h"
 #include "lu_storage/vector.h"
-#include "lu_storage/map.h"
-#include "lu_process/process.h"
+#include "lu_memory/abstract_memory.h"
 
-#include "lu_state/state.h"
+#include <vector>
 
-using namespace lutil::v_1;
-
-
-class MyStateMachine : public StateDriver<MyStateMachine>
+class Foo
 {
 public:
-    bool test() { return true; }
+    char x;
 };
+
+
+class Bar : public Foo
+{
+};
+
+using Vector = lutil::Vec<lutil::managed_ptr<Foo>>;
+
+class my_mem : public lutil::uint16_memory
+{
+public:
+    using lutil::uint16_memory::uint16_memory;
+
+protected:
+    virtual void _write(uint16_t address,
+                        uint8_t *data,
+                        uint16_t size) override {}
+
+
+    /*
+    Execute a read operation with the given address, data,
+    and size.
+    */
+    virtual void _read(uint16_t address,
+                       uint8_t *into,
+                       uint16_t size) override {}
+
+};
+
+Vector make_it(Vector vv)
+{
+    lutil::managed_ptr<Foo> f(new Bar());
+    f->x = 'a';
+    vv.push(f);
+    return vv;
+}
+
+void print_it(Vector vv)
+{
+    std::cout << vv[0]->x << std::endl;
+}
 
 int main(int argc, char const *argv[])
 {
-    // ---------------------------------------------------
-    // MATRIX
+    Vector v;
 
-    Matrix<4, 4> mat;
-    mat[0][1] = 12.0f;
-    std::cout << mat[0][1] << std::endl;
+    v = make_it(v);
+    print_it(v);
 
-    Matrix<4, 4> mat2;
-    mat2[0][1] = 12.0f;
-    mat2 *= 2;
-    std::cout << (mat2[0][1]) << std::endl;
-    std::cout << (mat != mat2) << std::endl;
-
-    // ---------------------------------------------------
-    // VECTOR
-
-    Vec<float> vector;
-    vector.push(12.0);
-    vector.push(1.0);
-    vector.push(4.0);
-
-    auto it = vector.begin();
-    for (; it != vector.end(); it++) {
-        std::cout << (*it) << std::endl;
-    }
-
-    std::cout  << vector.pop(2) << std::endl; // == 4.0
-    std::cout  << vector.pop(-1) << std::endl; // == 1.0
-
-    std::cout << vector[0] << std::endl;
-
-    // ---------------------------------------------------
-    // MAP
-
-    Map<int, std::string> map;
-    map[1] = "test";
-    map[44] = "blue";
-
-    std::cout << map[1].c_str() << std::endl;
-
-    map.remove(44);
-    std::cout << (map.contains(44) ? "y": "n") << std::endl;    
-    std::cout << (map.contains(1) ? "y": "n") << std::endl;    
-
-    // ---
-    // STATE MACHINE
-    MyStateMachine machine;
-    machine.add_transition("Off", "Boot", &MyStateMachine::test);
-
-    Processor::get().init();
-    Processor::get().process();
-    std::cout << "The State: " << machine.current_state().c_str() << std::endl;
+    my_mem *mem = new my_mem(0x10);
+    Foo foo;
+    foo.x = '%';
+    mem->write(0, foo);
 
     // To keep the console
     throw std::runtime_error("foo");

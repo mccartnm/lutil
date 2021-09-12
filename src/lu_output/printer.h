@@ -1,7 +1,7 @@
 #pragma once
 #include "lutil.h"
 
-namespace lutil { namespace LUTIL_VERSION {
+namespace lutil {
 
 /* Cheap means of variadic print via the Serial toolkit for Ardiuno */
 struct Printer {
@@ -28,5 +28,4 @@ struct Printer {
     }
 };
 
-}
 }

@@ -8,6 +8,8 @@
 #pragma once
 #include "lutil.h"
 
+#define LUTIL_FLOAT_EPSILON -1e8
+
 #define _SCALAR_MATRIX_OP(op)            \
     for (int x = 0; x < COLUMNS; x++) {  \
         for (int y = 0; y < ROWS; y++) { \
@@ -16,7 +18,17 @@
     }                                    \
     return *this;
 
-namespace lutil { namespace LUTIL_VERSION {
+namespace lutil {
+
+
+inline bool fuzzy_match(float a, float b) {
+    return (fabs(a - b) < LUTIL_FLOAT_EPSILON);
+}
+
+template<typename T>
+inline T clamp(T low, T value, T high) {
+    return (value > high) ? high : (value < low) ? low : value;
+}
 
 
 template<size_t COLUMNS, size_t ROWS>
@@ -115,5 +127,4 @@ private:
     float _data[COLUMNS][ROWS];
 };
 
-}
 }

@@ -4,10 +4,16 @@
 #pragma once
 #include "lutil.h"
 #include "lu_storage/map.h"
+#include "lu_output/printer.h"
 #include "lu_process/process.h"
 #include "lu_memory/managed_ptr.h"
 
-namespace lutil { namespace LUTIL_VERSION {
+#include "lu_state/state_macros.h"
+
+#define STATE(name) \
+    constexpr char name[] = #name;
+
+namespace lutil {
 
 /*
     Abstract class to help with passing a state machine about.
@@ -45,10 +51,23 @@ public:
 
     StateDriver() {
         _current_state = _initial_state();
+        _register_machine();
     }
 
     managed_string current_state() const {
-        return _known_states.key_from_value(_current_state);
+        // Printer::print("_GCS_ %", _known_states.count())
+        // delay(100);
+
+        auto s = _known_states.key_from_value(_current_state);
+
+        // Printer::print("__st: %", s.c_str());
+        // delay(100);
+
+        return s;
+    }
+
+    uint16_t current_state_id() const {
+        return _current_state;
     }
 
     bool add_runtime(managed_string state, RuntimeFunction func) {
@@ -81,10 +100,24 @@ public:
     }
 
     void process() override {
+
+        // Printer::println(" - Process: % %", id(), _current_state)
+        // delay(250);
+        // Serial.println(current_state().c_str());
+        // delay(250);
+
+        //
+        // First, we execute the runtimes associated with this state
+        //
         if (_runtimes.contains(_current_state)) {
+
+            // Serial.println("   - runtime...");
+            // delay(250);
+
             Vec<RuntimeFunction> &runtimes = _runtimes[_current_state];
             auto it = runtimes.begin();
             uint16_t original_state = _current_state;
+
             for (; it != runtimes.end(); it++) {
                 Derived *self = static_cast<Derived *>(this);
                 RuntimeFunction &func = *it;
@@ -96,7 +129,18 @@ public:
             }
         }
 
+        // Serial.println("Checking for predicates....");
+        // delay(250);
+
+        //
+        // Then, pending the state hasn't changed via the runtimes,
+        // we check for a transition predicate.
+        //
         if (_predicates.contains(_current_state)) {
+
+            // Serial.println("Running Predicates...");
+            // delay(250);
+
             PredicateMap &map = _predicates[_current_state];
             auto it = map.begin();
 
@@ -112,10 +156,32 @@ public:
         }
     }
 
+    virtual const char *id() const { return "State Driver"; }
+
+protected:
+    /*
+        Toolkit for the eventual dynamic declaration of state
+        transitions - that way we can move more logic out
+    */
+    virtual void _register_machine() {}
+    void _register_runtime(managed_string name, RuntimeFunction func) {
+        _reg_runtime[name].push(func);
+    }
+    void _register_transition(managed_string name, TransitionPredicate predicate) {
+        _reg_transitions[name].push(predicate);
+    }
+
+    // -- Force a partiuclar state
+    bool set_current_state(managed_string name) {
+        _current_state = _state_id(name);
+        return true;
+    }
+
 private:
     uint16_t _state_id(managed_string state) {
         if (!_known_states.contains(state)) {
-            _known_states[state] = (uint16_t)_known_states.count();
+            uint16_t id = _known_states.count();
+            _known_states.insert(state, id);
         }
         return _known_states[state];
     }
@@ -142,7 +208,10 @@ private:
     Map<managed_string, uint16_t> _known_states;
     Map<uint16_t, PredicateMap> _predicates;
     Map<uint16_t, Vec<RuntimeFunction>> _runtimes;
+
+
+    Map<managed_string, Vec<TransitionPredicate>> _reg_transitions;
+    Map<managed_string, Vec<RuntimeFunction>> _reg_runtime;
 };
 
-}
 }

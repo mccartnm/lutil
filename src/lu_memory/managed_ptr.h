@@ -3,8 +3,6 @@
 
 namespace lutil {
 
-namespace LUTIL_VERSION {
-
 template<typename T>
 inline void swap_ptr(T **a, T **b)
 {
@@ -157,11 +155,72 @@ public:
     {
     }
 
+    class iterator
+    {
+    public:
+        iterator(managed_data *d, size_t index = 0)
+            : _d(d)
+            , _index((int)index)
+        {}
+
+        iterator(const iterator &it)
+            : _d(it._d)
+            , _index(it._index)
+        {}
+
+        bool operator== (const iterator &other) const {
+            return (_d == other._d) && (_index == other._index);
+        }
+
+        bool operator!= (const iterator &other) const {
+            return !(this == &other);
+        }
+
+        uint8_t &operator* ()
+        {
+            return *(_d->get() + _index);
+        }
+
+        iterator operator+(size_t offset)
+        {
+            return iterator(_d, _index + offset);
+        }
+
+        iterator operator-(size_t offset)
+        {
+            return iterator(_d, _index - offset);
+        }
+
+        iterator &operator++()
+        {
+            _index++;
+            return *this;
+        }
+
+        iterator operator++(int)
+        {
+            iterator it(*this);
+            _index++;
+            return it;
+        }
+    private:
+        managed_data *_d;
+        int _index;
+    };
+
+    iterator begin() {
+        return iterator(this);
+    }
+
+    iterator end() {
+        return iterator(this, (int)_size);
+    }
+
     explicit managed_data(size_t size)
         : managed_ptr(new uint8_t[size])
         , _size(size)
     {
-        memset(get(), 0, _size);
+        zero();
     }
 
     uint8_t operator[](int index) const {
@@ -171,9 +230,22 @@ public:
         return *(get() + index);
     }
 
-    void set(uint8_t *data) {
-        if (_size > 0)
-            memcpy(get(), data, _size);
+    uint8_t &operator[](int index) {
+        return *(get() + index);
+    }
+
+    void set(uint8_t *data, size_t *size = nullptr) {
+        if (size == nullptr)
+            size = &_size;
+
+        if (size > 0)
+            memcpy(get(), data, *size);
+    }
+
+    void zero() {
+        // Set all data to 0
+        if (*this)
+            memset(get(), 0, _size);
     }
 
     size_t size() const { return _size; }
@@ -182,5 +254,4 @@ private:
     size_t _size;
 };
 
-}
 }
