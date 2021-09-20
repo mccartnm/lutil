@@ -208,12 +208,73 @@ public:
         int _index;
     };
 
+    class const_iterator
+    {
+    public:
+        const_iterator(const managed_data *d, size_t index = 0)
+            : _d(d)
+            , _index((int)index)
+        {}
+
+        const_iterator(const const_iterator &it)
+            : _d(it._d)
+            , _index(it._index)
+        {}
+
+        bool operator== (const const_iterator &other) const {
+            return (_d == other._d) && (_index == other._index);
+        }
+
+        bool operator!= (const const_iterator &other) const {
+            return !(this == &other);
+        }
+
+        const uint8_t &operator* ()
+        {
+            return *(_d->get() + _index);
+        }
+
+        const_iterator operator+(size_t offset)
+        {
+            return const_iterator(_d, _index + offset);
+        }
+
+        const_iterator operator-(size_t offset)
+        {
+            return const_iterator(_d, _index - offset);
+        }
+
+        const_iterator &operator++()
+        {
+            _index++;
+            return *this;
+        }
+
+        const_iterator operator++(int)
+        {
+            const_iterator it(*this);
+            _index++;
+            return it;
+        }
+    private:
+        const managed_data *_d;
+        int _index;
+    };
+
     iterator begin() {
         return iterator(this);
     }
 
+    const_iterator begin() const {
+        return const_iterator(this);
+    }
+
     iterator end() {
         return iterator(this, (int)_size);
+    }
+
+    const_iterator end() const {
+        return const_iterator(this, (int)_size);
     }
 
     explicit managed_data(size_t size)
@@ -234,12 +295,13 @@ public:
         return *(get() + index);
     }
 
-    void set(uint8_t *data, size_t *size = nullptr) {
-        if (size == nullptr)
-            size = &_size;
+    void reset(uint8_t *data, size_t size) {
+        _size = size;
 
-        if (size > 0)
-            memcpy(get(), data, *size);
+        uint8_t *d = new uint8_t[_size];
+        memcpy(d, data, _size);
+
+        managed_ptr<uint8_t>::reset(d);
     }
 
     void zero() {
