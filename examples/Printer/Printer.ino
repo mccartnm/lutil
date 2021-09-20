@@ -13,14 +13,12 @@
 #include "lutil.h"
 #include "lu_output/printer.h"
 
-namespace util = lutil::LUTIL_VERSION;
-
 float x, y, z = 0;
 
 void setup() {}
 
 void loop() {
-    util::Printer::print("x: % y: % z: %\n", x, y, z);
+    lutil::Printer::print("x: % y: % z: %\n", x, y, z);
 
     x++; 
     y--; 

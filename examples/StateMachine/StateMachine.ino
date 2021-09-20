@@ -21,9 +21,10 @@
 */
 #include "lutil.h"
 #include "lu_state/state.h"
+#include "lu_interface/led.h"
 #include "lu_process/button.h"
 
-using namespace lutil::v_1;
+using namespace lutil;
 
 Button<5> go_button;  // Basic push button on pin 5
 Led on_light(9);      // Basic single color LED on pin 9

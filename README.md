@@ -5,6 +5,23 @@ Template utilities for embedded systems. Built for _extremely_ lightweight appli
 
 ## Embedded Utils:
 
+### XBee Series 3 Interface
+Simple to use interface for API mode XBee Series 3 modules.
+
+```cpp
+lutil::XBee3 xbee;
+lutil::XBee3Adress addr{ 0x01234567,0x01234567 };
+
+xbee.setStream(&Serial2);
+
+uint8_t msg[] = "Send this!"
+xbee.send(msg, sizeof(msg));
+```
+
+Full example:
+- [XBee3 Sender](./examples/XBee3/XBee3_Sender.ino)
+- [XBee3 Receiver](./examples/XBee3/XBee3_Receiver.ino)
+
 ### Multi-element Printer (`Printer::print`)
 A quick-and-dirty means of printing multiple values without needing so many `Serial.println` commands
 
