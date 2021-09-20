@@ -186,6 +186,7 @@ uint8_t &Xbee3Response::operator[] (uint16_t pos)
 
 XBee3::XBee3()
     : _pos(0)
+    , _timeout(1000)
 {
 }
 
@@ -212,7 +213,6 @@ Xbee3Response::Status XBee3::poll()
 {
     if (_latest_response.isValid())
     {
-        // Reset!
         _latest_response = Xbee3Response();
     }
 
@@ -222,6 +222,7 @@ Xbee3Response::Status XBee3::poll()
 
         if (_pos == 0)
         {
+            _next_timeout = millis() + _timeout;
             _working_response = Xbee3Response();
 
             if (b != kStartByte)
@@ -303,7 +304,18 @@ Xbee3Response::Status XBee3::poll()
         _pos++;
     }
 
+    if (_next_timeout < millis())
+    {
+        // We've timed out this request. Reset
+        _pos = 0;
+        return Xbee3Response::Timeout;
+    }
     return Xbee3Response::InProgress;
+}
+
+void XBee3::setTimeout(size_t timeout)
+{
+    _timeout = timeout;
 }
 
 const Xbee3Response &XBee3::response() const

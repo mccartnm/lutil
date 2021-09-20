@@ -69,6 +69,7 @@ public:
         InProgress,
         Invalid,
         TooLarge,
+        Timeout,
     };
 
     Xbee3Response();
@@ -121,6 +122,11 @@ public:
     // Get the latest tranmission (if any)
     const Xbee3Response &response() const;
 
+    // ms of time that a request can be built for
+    // If it takes longer than this, we assume a
+    // reset
+    void setTimeout(size_t timeout);
+
 private:
     Stream *_stream = nullptr;
 
@@ -133,6 +139,9 @@ private:
     // all data is collected)
     Xbee3Response _working_response;
     uint32_t _pos;
+
+    uint32_t _next_timeout;
+    uint32_t _timeout;
 };
 
 } // namespace lutil
