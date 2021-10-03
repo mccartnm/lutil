@@ -37,7 +37,6 @@ struct RgbLed {
     }
 };
 
-
 struct Led {
     Led(uint8_t pin) : _pin(pin) {}
 
@@ -62,9 +61,11 @@ struct Led {
         }
     }
     void fade(unsigned long period) {
-        auto current_time = millis();
-        float oscl = 1.0 + cos((2 * PI) / period * (current_time % period));
-            analogWrite(_pin, int(255. * (oscl / 2.0)));
+        uint32_t current_time = millis();
+        float oscl = (
+            1.0 + cos((2 * PI) / period * (current_time % period))
+        ) / 2.;
+        analogWrite(_pin, int(255. * (oscl)));
     }
 
     void inline_blink(unsigned long value, int ms = 30) {

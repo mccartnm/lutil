@@ -3,6 +3,7 @@
 */
 #include "lutil.h"
 #include "lu_storage/map.h"
+#include "lu_memory/managed_ptr.h"
 
 namespace lutil {
 
@@ -12,10 +13,14 @@ public:
     explicit Ini(String data);
     explicit Ini(lutil::managed_data data);
 
-    String value(const char *name, const char *section = nullptr);
-    int    value(const char *name, const char *section = nullptr);
-    float  value(const char *name, const char *section = nullptr);
-    bool   value(const char *name, const char *section = nullptr);
+    template<typename T>
+    T value(const char *name, const char *section = nullptr) const
+    {
+        // get_string()
+        return T();
+    }
+
+    // String get_string(const char *name, const char *section = nullptr) const;
 
     void set_value(const char *name, String value, const char *section = nullptr);
     void set_value(const char *name, int value, const char *section = nullptr);

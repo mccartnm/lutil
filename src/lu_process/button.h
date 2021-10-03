@@ -20,13 +20,13 @@ enum class ButtonState {
     Implements a basic debouncing as well as allows event consumption
     from a higher level loop (a-la the main program loop)
 */
-template<size_t PIN>
 class Button : public Processable {
 public:
 
-    Button()
+    Button(int pin)
         : Processable()
         , _active_state(ButtonState::Up)
+        , _pin(pin)
         , _change_start(0)
         , _last_read(false)
     {}
@@ -36,11 +36,11 @@ public:
     }
 
     void init() override {
-        pinMode(PIN, INPUT);
+        pinMode(_pin, INPUT);
     }
 
     void process() override {
-        auto read = digitalRead(PIN);
+        auto read = digitalRead(_pin);
 
         //
         // Tiny debounce filter for any noise. Callbacks are
@@ -104,6 +104,7 @@ public:
 private:
     ButtonState _active_state;
 
+    int _pin;
     unsigned long _change_start;
     bool _last_read;
 };

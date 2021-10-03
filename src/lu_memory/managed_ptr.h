@@ -304,6 +304,11 @@ public:
         managed_ptr<uint8_t>::reset(d);
     }
 
+    void take(uint8_t *data, size_t size) {
+        _size = size;
+        managed_ptr<uint8_t>::reset(data);
+    }
+
     void zero() {
         // Set all data to 0
         if (*this)

@@ -38,18 +38,19 @@ Processable::Processable()
     Processor::get().add_processable(this);
 }
 
-void Processable::when(int trigger, ProcessCallback callback) {
+void Processable::when(int trigger, ProcessCallback callback, void *data)
+{
     if (!_callbacks.contains(trigger)) {
-        _callbacks.insert(trigger, Vec<ProcessCallback>());
+        _callbacks.insert(trigger, Vec<Callback>());
     }
-    _callbacks[trigger].push(callback);
+    _callbacks[trigger].push({callback, data});
 }
 
 void Processable::event(int trigger) {
     if (_callbacks.contains(trigger)) {
         auto &cb_vec = _callbacks[trigger];
         for (size_t i = 0; i < cb_vec.count(); i++) {
-            cb_vec[i]();
+            cb_vec[i].callback(cb_vec[i].data);
         }
     }
 }

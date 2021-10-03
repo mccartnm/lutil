@@ -1,11 +1,5 @@
 {
     "name": "lutil",
     "version": "1.0.1",
-    "dependencies": [
-        {
-            "owner": "arduino-libraries",
-            "name": "Servo",
-            "version": "^1.1.8"
-        }
-    ]
+    "dependencies": []
 }

@@ -17,7 +17,7 @@ XBee3Request::XBee3Request(const XBee3Address &address)
 void XBee3Request::setPayload(uint8_t *payload, uint16_t size)
 {
     size_t s = size;
-    _payload.reset(payload, s);
+    _payload.reset(payload, s); // copies data
 }
 
 void XBee3Request::setPayload(const managed_data &payload)
@@ -195,26 +195,28 @@ Stream *XBee3::stream() const
     return _stream;
 }
 
-void XBee3::setStream(Stream *stream)
+void XBee3::setStream(Stream *input, Stream *output)
 {
-    _stream = stream;
+    _stream = input;
+    _output_stream = output ? output : input;
 }
 
 void XBee3::send(const XBee3Request &request)
 {
-    if (!_stream)
+    if (!_output_stream)
         return;
 
     RawData d = request.data();
-    _stream->write(d.data, d.size);
+    _output_stream->write(d.data, d.size);
 }
 
 Xbee3Response::Status XBee3::poll()
 {
+    if (!_stream)
+        return Xbee3Response::Invalid;
+
     if (_latest_response.isValid())
-    {
         _latest_response = Xbee3Response();
-    }
 
     while (_stream->available() > 0)
     {
@@ -304,13 +306,17 @@ Xbee3Response::Status XBee3::poll()
         _pos++;
     }
 
-    if (_next_timeout < millis())
+    if (_pos > 0 && _next_timeout < millis())
     {
         // We've timed out this request. Reset
         _pos = 0;
         return Xbee3Response::Timeout;
     }
-    return Xbee3Response::InProgress;
+
+    if (_pos > 0)
+        return Xbee3Response::InProgress;
+    else
+        return Xbee3Response::None;
 }
 
 void XBee3::setTimeout(size_t timeout)

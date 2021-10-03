@@ -65,6 +65,7 @@ class Xbee3Response
 public:
     enum Status
     {
+        None,
         Valid,
         InProgress,
         Invalid,
@@ -111,7 +112,7 @@ public:
     XBee3();
 
     Stream *stream() const;
-    void setStream(Stream *stream);
+    void setStream(Stream *input, Stream *output = nullptr);
 
     // Send a payload request to another XBee3
     void send(const XBee3Request &request);
@@ -129,6 +130,7 @@ public:
 
 private:
     Stream *_stream = nullptr;
+    Stream *_output_stream = nullptr;
 
     // When we poll, if the response is valid, this
     // is populated

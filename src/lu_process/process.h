@@ -22,7 +22,7 @@ private:
     Vec<Processable *> _processables;
 };
 
-typedef void (*ProcessCallback)();
+typedef void (*ProcessCallback)(void *);
 
 class Processable {
 public:
@@ -31,7 +31,11 @@ public:
     virtual void init() = 0;
     virtual void process() = 0;
 
-    void when(int trigger, ProcessCallback callback);
+    void when(
+        int trigger,
+        ProcessCallback callback,
+        void *data = nullptr
+    );
 
 protected:
     // Called when an event occurs which will in turn fire any
@@ -39,7 +43,12 @@ protected:
     void event(int trigger);
 
 private:
-    Map<int, Vec<ProcessCallback>> _callbacks;
+    struct Callback
+    {
+        ProcessCallback callback;
+        void *data;
+    };
+    Map<int, Vec<Callback>> _callbacks;
 };
 
 }
