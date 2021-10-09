@@ -155,7 +155,7 @@ XBee3Address Xbee3Response::sender() const
 managed_data Xbee3Response::data() const
 {
     // Account for the address, 16bit addr, api id
-    static size_t s_offset = sizeof(XBee3Address) + \
+    static size_t s_offset = (sizeof(uint32_t) * 2) + \
                              sizeof(uint16_t) + \
                              sizeof(uint8_t);
 
@@ -163,9 +163,9 @@ managed_data Xbee3Response::data() const
 
     // Data
     uint8_t *c = new uint8_t[
-        _payload.size() - s_offset - 1 // 1 for last byte
+        _payload.size() - s_offset
     ];
-    size_t realSize = _payload.size() - s_offset - 1;
+    size_t realSize = _payload.size() - s_offset;
 
     memcpy(
         c,
@@ -173,7 +173,7 @@ managed_data Xbee3Response::data() const
         realSize
     );
 
-    content.reset(c, realSize);
+    content.take(c, realSize);
     return content;
 }
 
@@ -275,7 +275,12 @@ Xbee3Response::Status XBee3::poll()
                 return Xbee3Response::TooLarge;
             }
 
-            if (_pos == (uint16_t)(_working_response.size() + kApiIndex))
+            // We have new data to punch into the managed
+            // data container of our working response
+            uint16_t working_position = _pos - (kApiIndex + 1);
+            _working_response[working_position] = b;
+
+            if (_pos >= (uint16_t)(_working_response.size() + kApiIndex - 1))
             {
                 // We're at the end of the packet. Check
                 // on the checksum
@@ -286,19 +291,6 @@ Xbee3Response::Status XBee3::poll()
                     _pos = 0; // We've completed a rotation
                     return Xbee3Response::Valid;
                 }
-                // else
-                // {
-                //     Serial.println("_bad_checksum_");
-                //     Serial.println(_working_response.checksum(), 16);
-                //     Serial.println(b, 16);
-                // }
-            }
-            else
-            {
-                // We have new data to punch into the managed
-                // data container of our working response
-                uint16_t working_position = _pos - (kApiIndex + 1);
-                _working_response[working_position] = b;
             }
             break;
         }

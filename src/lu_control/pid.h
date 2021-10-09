@@ -7,7 +7,7 @@
 
 namespace lutil {
 
-class PIDController {
+class LUTIL_API PIDController {
 
 public:
     PIDController(float kp = 1.00, float ki = 0, float kd = 0, float _target = 1.0);
