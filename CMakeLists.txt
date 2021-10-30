@@ -37,6 +37,7 @@ set (LUTIL_HEADERS
 
 set (LUTIL_SOURCES
     src/lu_control/pid.cpp
+    src/lu_math/axis.cpp
 )
 
 add_library(lutil SHARED

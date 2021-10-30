@@ -4,7 +4,7 @@
 namespace lutil {
 
 /* Basic 3D vector */
-struct Axis
+struct LUTIL_API Axis
 {
     float x;
     float y;

@@ -255,7 +255,6 @@ Xbee3Response::Status XBee3::poll()
 
             // Once we have the payload size, we can allocate
             _working_response.allocate();
-
             break;
         }
         case 3:
@@ -288,9 +287,9 @@ Xbee3Response::Status XBee3::poll()
                 {
                     // We have a valid payload!
                     _latest_response = _working_response;
-                    _pos = 0; // We've completed a rotation
                     return Xbee3Response::Valid;
                 }
+                _pos = 0; // Even an invalid payload needs to be reset
             }
             break;
         }

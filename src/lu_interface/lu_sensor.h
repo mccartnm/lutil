@@ -12,7 +12,30 @@ namespace lutil
     Generalized interface for sensors. Can handle multiple types of
     information from a single element.
 
-    TODO
+    The SensorData typename is the data structure that you want to
+    populate with your sensor. This can be useful for multi-sensor
+    projects that fill the same structure with different information
+    (e.g. Gryo, Accel, Temp, Baro, etc.).
+
+    struct MySensorData
+    {
+        lutil::Axis accel;
+        lutil::Axir rotation;
+        float temp;
+    }
+
+    // Base class
+    class MySensorBase : public lutil::lu_Sensor<MySensorData>
+    {
+        // ...
+    }
+
+    // Implementation for specific sensor
+    class MyGryo : public MySensorBase
+    {
+        // Implement read operation:
+        void read(MySensorData &into, int value_flags) override;
+    }
 */
 template<typename SensorData>
 class lu_Sensor
