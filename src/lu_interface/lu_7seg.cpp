@@ -190,7 +190,7 @@ void TimeCounter::process()
 
     uint8_t remainder = seconds % 60;
     uint16_t mins = (seconds - remainder) / 60;
-    mins = min(99, mins);
+    mins = min(99U, mins);
 
     set_number(0, (mins / 10) % 10);
     set_number(1, (mins % 10));

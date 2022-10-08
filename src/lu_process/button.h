@@ -5,8 +5,6 @@
 #include "lutil.h"
 #include "process.h"
 
-#define DEBOUNCE_DELAY 50 // ms
-
 namespace lutil {
 
 enum class ButtonState {
@@ -23,23 +21,27 @@ enum class ButtonState {
 class Button : public Processable {
 public:
 
-    Button(int pin)
+    Button(int pin, int debounce = 50)
         : Processable()
         , _active_state(ButtonState::Up)
         , _pin(pin)
+        , _debounce(debounce)
         , _change_start(0)
         , _last_read(false)
     {}
 
-    ButtonState state() const {
+    ButtonState state() const
+    {
         return _active_state;
     }
 
-    void init() override {
+    void init() override
+    {
         pinMode(_pin, INPUT);
     }
 
-    void process() override {
+    void process() override
+    {
         auto read = digitalRead(_pin);
 
         //
@@ -51,7 +53,7 @@ public:
             _change_start = millis();
         }
 
-        if ((millis() - _change_start) > DEBOUNCE_DELAY) {
+        if ((millis() - _change_start) > _debounce) {
             // State vessle for button reading
             switch(_active_state)
             {
@@ -82,6 +84,7 @@ public:
                 // We've let go of the button
                 if (read == LOW) {
                     _active_state = ButtonState::Released;
+                    released();
                     event(int(_active_state));
                 }
                 break;
@@ -90,6 +93,7 @@ public:
             {
                 if (read == HIGH) {
                     _active_state = ButtonState::Pressed;
+                    pressed();
                     event(int(_active_state));
                 }
                 break;
@@ -100,11 +104,22 @@ public:
         _last_read = read;
     }
 
+    void set_debounce(int debounce)
+    {
+        _debounce = debounce;
+    }
+
+protected:
+
+    // Overloadable for fun and profit
+    virtual void released() {}
+    virtual void pressed() {}
 
 private:
     ButtonState _active_state;
 
     int _pin;
+    uint8_t _debounce;
     unsigned long _change_start;
     bool _last_read;
 };

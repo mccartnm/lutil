@@ -1,7 +1,12 @@
 #pragma once
 #include "lutil.h"
 
+#ifdef CORE_TEENSY
+#include <PWMServo.h>
+#define Servo PWMServo
+#else
 #include <Servo.h>
+#endif
 
 namespace lutil
 {

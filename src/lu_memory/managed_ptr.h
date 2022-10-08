@@ -11,6 +11,14 @@ inline void swap_ptr(T **a, T **b)
     *b = temp;
 }
 
+template<typename T>
+inline void swap_val(T &a, T &b)
+{
+    T temp = a;
+    a = b;
+    b = temp;
+}
+
 template<class T>
 class managed_ptr {
 

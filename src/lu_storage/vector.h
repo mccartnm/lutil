@@ -1,7 +1,6 @@
 #pragma once
 #include "lutil.h"
-
-
+#include "lu_memory/managed_ptr.h"
 
 #define DEFAULT_SIZE 5
 
@@ -121,6 +120,13 @@ public:
                 return true;
         }
         return false;
+    }
+
+    void swap(Vec<T> &other)
+    {
+        swap_ptr(&_elements, &other._elements);
+        swap_val<size_t>(_size, other._size);
+        swap_val<size_t>(_count, other._count);
     }
 
     // ----------------------------------------------------------------

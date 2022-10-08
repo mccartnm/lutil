@@ -139,15 +139,15 @@ XBee3Address Xbee3Response::sender() const
 {
     XBee3Address addr{ 0, 0 };
 
-    addr.high += _payload[0] << 24;
-    addr.high += _payload[1] << 16;
-    addr.high += _payload[2] << 8;
-    addr.high += _payload[3];
+    addr.high += uint32_t(_payload[0]) << 24;
+    addr.high += uint32_t(_payload[1]) << 16;
+    addr.high += uint32_t(_payload[2]) << 8;
+    addr.high += uint32_t(_payload[3]);
 
-    addr.low += _payload[4] << 24;
-    addr.low += _payload[5] << 16;
-    addr.low += _payload[6] << 8;
-    addr.low += _payload[7];
+    addr.low += uint32_t(_payload[4]) << 24;
+    addr.low += uint32_t(_payload[5]) << 16;
+    addr.low += uint32_t(_payload[6]) << 8;
+    addr.low += uint32_t(_payload[7]);
 
     return addr;
 }

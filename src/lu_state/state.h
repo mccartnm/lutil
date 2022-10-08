@@ -183,15 +183,17 @@ private:
             uint16_t id = _known_states.count();
             _known_states.insert(state, id);
         }
-        return _known_states[state];
+
+        uint16_t output = _known_states[state];
+        return output;
     }
 
     /*
         We have to make sure that initial state has an id
     */
     uint16_t _initial_state() {
-        managed_string st = initial_state();
-        return _state_id(st);
+        // managed_string st = initial_state();
+        return 0;
     }
 
     uint16_t _current_state;
